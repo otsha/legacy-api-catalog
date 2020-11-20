@@ -10,7 +10,7 @@ const Main = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const fetchedProducts = await apiService.getCategory(category.name)
+      const fetchedProducts = await apiService.getProductsByCategory(category.name)
       fetchedProducts && setProducts(fetchedProducts)
     }
 
