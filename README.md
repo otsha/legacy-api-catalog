@@ -1,2 +1,24 @@
-# legacy-api-catalog
-A product availability solution combining two legacy API sources.
+# Legacy API Product Catalog
+
+*A demo application for warehouse use that fetches and combines product information from two legacy APIs in a single user interface.*
+
+## To Run the Application Locally
+
+1. Make sure you have Node.js and a your preferred package manager (Yarn or npm) installed
+2. Download the repository or clone it using Git:
+```
+$ git clone https://github.com/otsha/legacy-api-catalog.git <directory-name-here>
+```
+3. Install the required dependencies 
+```bash
+$ yarn install
+```
+4. To run the application in development mode, run the ```dev``` script:
+```bash
+$ yarn dev
+```
+5. Navigate to ```http://localhost:3000``` in your web browser
+
+
+## Why Next.js?
+First and foremost, Next.js is a React framework and I'm already familiar with React. Secondly, with the APIs already existing on the client's server, there was no need to build a more complex [Node.js](https://nodejs.org/en/) & [Express](https://github.com/expressjs/express) setup - a simple [JAMStack](https://jamstack.org/) application would do. It's also a little less opinionated and [a little more battle tested](https://nextjs.org/showcase) compared to something like [Gatsby](https://www.gatsbyjs.com/), which in turn would offer better SEO and a hefty number of plugins for all kinds of uses - if those were required features.
