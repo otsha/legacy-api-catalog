@@ -2,34 +2,38 @@ import axios from 'axios'
 
 const apiUrl = 'https://bad-api-assignment.reaktor.com'
 
-/* NOTE: The current CORS options of the API do not allow accessing the ETag header. */
-let categoryETag = ''
-let manufacturerETag = ''
-
 /**
  * Fetches products in a given category from the product API, then
  * combines availability information fetched from the availability API to
- * return a list of products with all desired information included.
+ * return a list of products with all the desired information included.
  *
  * @param {*} category The category from which to fetch products
  */
 const getProductsByCategory = async (category) => {
   const products = await getCategory(category)
-  const manufacturers = [...new Set(products.map(p => p.manufacturer))]
 
-  let availabilitiesByManufacturer = []
-  for (const manufacturer of manufacturers) {
-    const manufacturerInfo = await getManufacturer(manufacturer)
-    availabilitiesByManufacturer.push(manufacturerInfo)
+  if (products.error) {
+    return products
   }
 
-  const availabilities = [].concat.apply([], availabilitiesByManufacturer)
+  const manufacturers = [...new Set(products.map(p => p.manufacturer))]
+
+  const availabilities = await Promise.all(
+    manufacturers.map(async m => ({
+      name: m,
+      products: await getManufacturer(m)
+    }))
+  )
 
   const productsWithAvailability = products.map(product => {
-    const availabilityInfo = availabilities.find(p => p.id === product.id.toUpperCase())
+    const productAvailability = availabilities
+      .find(manufacturer => manufacturer.name === product.manufacturer)
+      .products
+      .find(p => p.id.toUpperCase() === product.id.toUpperCase())
+
     return ({
       ...product,
-      availability: availabilityInfo ? availabilityInfo.DATAPAYLOAD : null
+      availability: productAvailability ? productAvailability.DATAPAYLOAD : null
     })
   })
 
@@ -42,18 +46,13 @@ const getProductsByCategory = async (category) => {
  * @param {*} category The category to be fetched
  */
 const getCategory = async (category) => {
-  const config = { headers: { 'If-None-Match': categoryETag } }
-  const res = await axios.get(`${apiUrl}/products/${category}`, config)
+  const res = await axios.get(`${apiUrl}/products/${category}`)
 
   switch (res.status) {
     case 200:
-      categoryETag = res.headers['etag']
       return res.data
-    case 304:
-      return null
     default:
-      console.warn('Server returned', res.status, res.statusText)
-      return null
+      return { error: `ERROR: Product API returned ${res.status}: ${res.statusText}` }
   }
 }
 
@@ -63,18 +62,13 @@ const getCategory = async (category) => {
  * @param {*} manufacturer The manufacturer whose availability info should be fetched
  */
 const getManufacturer = async (manufacturer) => {
-  const config = { headers: { 'If-None-Match': manufacturerETag } }
-  const res = await axios.get(`${apiUrl}/availability/${manufacturer}`, config)
+  const res = await axios.get(`${apiUrl}/availability/${manufacturer}`)
 
   switch (res.status) {
     case 200:
-      res.data.response !== [] && (manufacturerETag = res.headers['etag'])
       return res.data.response
-    case 304:
-      return null
     default:
-      console.warn('Server returned', res.status, res.statusText)
-      return null
+      return []
   }
 }
 

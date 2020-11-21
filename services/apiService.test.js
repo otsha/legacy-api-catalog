@@ -40,34 +40,62 @@ const apiFailureResponse = { code: 200, response: [] }
 describe('When the availability API does not fail', () => {
   test('Valid availabilities are returned', async () => {
     axios.get
-      .mockResolvedValueOnce({ status: 200, headers: { etag: '012345' }, data: mockJackets })
-      .mockResolvedValueOnce({ status: 200, headers: { etag: '123456' }, data: mockManufacturers[0] })
-      .mockResolvedValueOnce({ status: 200, headers: { etag: '234567' }, data: mockManufacturers[1] })
-      .mockResolvedValue({ status: 200, headers: { etag: '345678' }, data: mockManufacturers[2] })
+      .mockResolvedValueOnce({ status: 200, data: mockJackets })
+      .mockResolvedValueOnce({ status: 200, data: mockManufacturers[0] })
+      .mockResolvedValueOnce({ status: 200, data: mockManufacturers[1] })
+      .mockResolvedValue({ status: 200, data: mockManufacturers[2] })
 
     const products = await apiService.getProductsByCategory('jackets')
     expect(products.every(p => p.availability !== null)).toBe(true)
   })
 })
 
-describe('When the availability API fails and returns an empty array for some manufacturer(s)', () => {
-  test('The product availability field still exists', async () => {
-    axios.get
-      .mockResolvedValueOnce({ status: 200, headers: { etag: '012345' }, data: mockJackets })
-      .mockResolvedValueOnce({ status: 200, headers: { etag: '123456' }, data: mockManufacturers[0] })
-      .mockResolvedValue({ status: 200, headers: { etag: '123456' }, data: apiFailureResponse })
+describe('When the availability API fails', () => {
 
-    const products = await apiService.getProductsByCategory('jackets')
-    products.map(p => expect(p).toHaveProperty('availability'))
+  describe('by returning code 200 and an empty array for some manufacturer(s)', () => {
+    beforeEach(() => {
+      axios.get
+        .mockResolvedValueOnce({ status: 200, data: mockJackets })
+        .mockResolvedValueOnce({ status: 200, data: mockManufacturers[0] })
+        .mockResolvedValue({ status: 200, data: apiFailureResponse })
+    })
+
+    test('The product availability field is still created', async () => {
+      const products = await apiService.getProductsByCategory('jackets')
+      products.map(p => expect(p).toHaveProperty('availability'))
+    })
+
+    test('Missing availability information is set to null', async () => {
+      const products = await apiService.getProductsByCategory('jackets')
+      expect(products.some(p => p.availability === null)).toBe(true)
+    })
   })
 
-  test('Missing product availability information is set to null', async () => {
-    axios.get
-      .mockResolvedValueOnce({ status: 200, headers: { etag: '012345' }, data: mockJackets })
-      .mockResolvedValueOnce({ status: 200, headers: { etag: '123456' }, data: mockManufacturers[0] })
-      .mockResolvedValue({ status: 200, headers: { etag: '234567' }, data: apiFailureResponse })
+  describe('by returning something other than code 200', () => {
 
-    const products = await apiService.getProductsByCategory('jackets')
-    expect(products.some(p => p.availability === null)).toBe(true)
+    beforeEach(() => {
+      axios.get
+        .mockResolvedValueOnce({ status: 200, data: mockJackets })
+        .mockResolvedValue({ status: 500, statusText: 'Internal Server Error' })
+    })
+
+    test('The product availability field is still created', async () => {
+      const products = await apiService.getProductsByCategory('jackets')
+      products.map(p => expect(p).toHaveProperty('availability'))
+    })
+
+    test('Missing availability information is set to null', async () => {
+      const products = await apiService.getProductsByCategory('jackets')
+      expect(products.some(p => p.availability === null)).toBe(true)
+    })
   })
+})
+
+test('When the product API returns something other than code 200 an error message is parsed', async () => {
+  const mockError = { status: 418, statusText: 'I\'m a teapot' }
+  axios.get.mockResolvedValue(mockError)
+
+  const products = await apiService.getProductsByCategory('shirts')
+  expect(products.error).toBeDefined()
+  expect(products.error).toContain(mockError.status, mockError.statusText)
 })

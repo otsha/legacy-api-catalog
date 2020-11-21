@@ -7,11 +7,14 @@ const categories = [{ name: 'jackets' }, { name: 'shirts' }, { name: 'accessorie
 const Main = () => {
   const [category, setCategory] = useState(categories.find(c => c.name === 'jackets'))
   const [products, setProducts] = useState([])
+  const [error, setError] = useState('')
 
   useEffect(() => {
     const fetchProducts = async () => {
       const fetchedProducts = await apiService.getProductsByCategory(category.name)
-      fetchedProducts && setProducts(fetchedProducts)
+      fetchedProducts.error
+        ? setError(fetchedProducts.error)
+        : setProducts(fetchedProducts)
     }
 
     fetchProducts()
@@ -29,6 +32,7 @@ const Main = () => {
           </button>
         )}
       </nav>
+      {error && <p>{error}</p>}
       <ProductList products={products} />
     </>
   )
