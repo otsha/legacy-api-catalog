@@ -29,19 +29,20 @@ nav {
     background-color: #dfdfdf;
 }
 
-nav > button {
-    font-weight: bold;
+nav > a.nav-link {
+    text-decoration: none;
+    color: black;
     padding: 1em;
     border: none;
     background: transparent;
     border-right: 1px solid #f2f2f2;
 }
 
-nav > button:active, button:hover, button:focus {
+nav > a.nav-link:active, a.nav-link:hover, a.nav-link:focus {
     background-color: rgba(0, 0, 0, 0.2);
 }
 
-nav > button.active-category {
+nav > a.nav-link.active-category {
     background-color: #ff789b;
     box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
 }
@@ -56,7 +57,7 @@ table {
 
 thead {
     position: sticky;
-    top: 41px;
+    top: 51px;
     text-align: left;
     background-color: #2f2f2f;
     color: #f2f2f2;
