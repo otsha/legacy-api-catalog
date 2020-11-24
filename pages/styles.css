@@ -1,0 +1,78 @@
+html, body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+#__next {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    width: 50%;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-self: flex-start;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+
+    background-color: #dfdfdf;
+}
+
+nav > a.nav-link {
+    text-decoration: none;
+    color: black;
+    padding: 1em;
+    border: none;
+    background: transparent;
+    border-right: 1px solid #f2f2f2;
+}
+
+nav > a.nav-link:active, a.nav-link:hover, a.nav-link:focus {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+nav > a.nav-link.active-category {
+    background-color: #ff789b;
+    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+table {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+}
+
+thead {
+    position: sticky;
+    top: 51px;
+    text-align: left;
+    background-color: #2f2f2f;
+    color: #f2f2f2;
+    box-shadow: 0 3px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+td, th {
+    margin: 0;
+    padding: 0.5em;
+}
+
+tbody > tr:nth-child(odd) {
+    background-color: #f2f2f2;
+}
+
+tbody > tr:nth-child(even) {
+    background-color: #dfdfdf;
+}
