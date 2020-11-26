@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import Link from 'next/link'
+import Navigation from '../components/Navigation'
 import ProductList from '../components/ProductList'
 import apiService from '../services/apiService'
 
@@ -31,18 +31,7 @@ const Category = () => {
 
   return (
     <>
-      <h1>Product Catalog</h1>
-      <nav>
-        {categories.map(cat =>
-          <Link
-            key={cat.name}
-            href={`/${cat.name.toLowerCase()}`}>
-            <a className={cat.name.toLowerCase() === category ? 'nav-link active-category' : 'nav-link'}>
-              {cat.name}
-            </a>
-          </Link>
-        )}
-      </nav>
+      <Navigation categories={categories} currentCategory={category} />
       { error && <p>{error}</p>}
       <ProductList products={products} />
     </>

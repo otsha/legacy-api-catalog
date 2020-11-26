@@ -2,7 +2,7 @@ import React from 'react'
 
 const ProductList = ({ products }) => {
   if (!products) {
-    return <div>Loading...</div>
+    return <p className='loading'>Loading...</p>
   }
 
   return (
